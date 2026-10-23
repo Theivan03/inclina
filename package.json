@@ -1,6 +1,6 @@
 {
   "name": "inclina",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Inclina: inclinómetro de moto (PWA + Android + iOS con Capacitor)",
   "scripts": {
     "sync": "cap sync",
@@ -13,7 +13,9 @@
   "author": "Ivan Cabrera",
   "license": "UNLICENSED",
   "dependencies": {
+    "@capacitor-community/background-geolocation": "^1.3.1",
     "@capacitor-community/keep-awake": "^8.0.1",
+    "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/android": "^8.5.3",
     "@capacitor/app": "^8.1.2",
     "@capacitor/cli": "^8.5.3",
@@ -22,7 +24,8 @@
     "@capacitor/geolocation": "^8.2.4",
     "@capacitor/ios": "^8.5.3",
     "@capacitor/share": "^8.0.3",
-    "@capacitor/splash-screen": "^8.0.2"
+    "@capacitor/splash-screen": "^8.0.2",
+    "maplibre-gl": "^5.24.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

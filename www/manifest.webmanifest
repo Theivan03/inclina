@@ -1,7 +1,7 @@
 {
   "name": "Inclina",
   "short_name": "Inclina",
-  "description": "Inclinómetro de moto: ángulo en vivo, máximos por curva y por salida, histórico y CSV.",
+  "description": "Graba tus rutas en moto con el ángulo de inclinación real en cada curva.",
   "lang": "es",
   "start_url": "./index.html",
   "scope": "./",

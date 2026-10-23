@@ -7,6 +7,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Build;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -77,6 +81,22 @@ public class MotionPlugin extends Plugin implements SensorEventListener {
         JSObject r = new JSObject();
         r.put("gyro", gyroscope != null);
         r.put("accel", accelerometer != null);
+        call.resolve(r);
+    }
+
+    /** Android 13+: sin este permiso no se ve la notificación del GPS en segundo plano. */
+    @PluginMethod
+    public void ensureNotificationPermission(PluginCall call) {
+        JSObject r = new JSObject();
+        if (Build.VERSION.SDK_INT >= 33) {
+            boolean granted = ContextCompat.checkSelfPermission(getContext(), "android.permission.POST_NOTIFICATIONS") == PackageManager.PERMISSION_GRANTED;
+            if (!granted && getActivity() != null) {
+                ActivityCompat.requestPermissions(getActivity(), new String[] { "android.permission.POST_NOTIFICATIONS" }, 7031);
+            }
+            r.put("granted", granted);
+        } else {
+            r.put("granted", true);
+        }
         call.resolve(r);
     }
 

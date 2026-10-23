@@ -106,7 +106,7 @@ Rellena cada apartado así:
 
 **Servicios financieros, Salud, Gobierno**: No.
 
-**Permisos sensibles**: la app solo pide ubicación en primer plano. No hay que rellenar el formulario de ubicación en segundo plano (solo aplica a ACCESS_BACKGROUND_LOCATION, que Inclina no declara).
+**Permisos sensibles**: la app pide ubicación precisa y, durante la grabación, mantiene un servicio en primer plano de tipo "location" con notificación (FOREGROUND_SERVICE_LOCATION). No declara ACCESS_BACKGROUND_LOCATION, así que el formulario de "ubicación en segundo plano" no aplica; si Play lo pregunta, explica que la grabación de rutas usa un servicio en primer plano iniciado por el usuario y visible en la barra de notificaciones.
 
 ## Notas de la versión (500)
 Primera versión: ángulo de inclinación en vivo, máximos por curva y por salida, histórico y exportación CSV.

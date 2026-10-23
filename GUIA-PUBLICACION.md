@@ -11,7 +11,9 @@ Orden recomendado: 1) compilar y probar en tu Android, 2) primera salida real, 3
 ## 0. Qué hay en el proyecto
 
 ```
-www/                   la app (index.html, lean-core.js, platform.js, fuentes, iconos, sw.js)
+www/                   la app: index.html (pantallas y estilos), app.js (lógica), lean-core.js (cálculo del
+                       ángulo), geo.js (distancias, GPX, trazados), db.js (IndexedDB), platform.js (GPS en
+                       segundo plano, sensores nativos, voz, compartir), vendor/ (MapLibre), fuentes e iconos
 capacitor.config.json  identificador com.ivancabrera.inclina, nombre Inclina, ajustes de barras y splash
 android/               proyecto Android Studio, ya con permisos, iconos, splash y firma preparada
 ios/                   proyecto Xcode, ya con permisos (Info.plist), iconos y splash, solo iPhone
@@ -159,6 +161,21 @@ Este APK es para instalarlo a mano. Para Google Play hace falta el AAB firmado d
 **Sensores nativos.** La app Android lee el giróscopo y el acelerómetro directamente (plugin
 `MotionPlugin.java`, hasta 200 muestras/s), no a través del WebView. En Ajustes → Sensores debe
 poner "sensores nativos" y una cifra alta de muestras/s. La PWA sigue usando los del navegador.
+
+**GPS en segundo plano.** Al grabar una ruta, la app arranca un servicio con notificación
+(@capacitor-community/background-geolocation) para que el GPS siga aunque se apague la pantalla.
+En Android 13+ pide el permiso de notificaciones la primera vez. Si la grabación se corta al
+bloquear el móvil, revisa que la app no tenga restringida la batería (Ajustes del sistema → Apps →
+Inclina → Batería → Sin restricciones).
+
+**Mapas.** Teselas vectoriales de OpenFreeMap (gratis, sin clave). Las zonas por las que ya has
+pasado quedan en caché del navegador/WebView para verlas sin cobertura (no es un mapa offline
+completo; eso llegará en la fase 2).
+
+**Ficha de Play Store.** Con la v2 hay que regenerar las capturas (`python3 tools/capturas.py` ya
+no vale tal cual: las pantallas han cambiado; hazlas a mano desde el móvil o pídemelas) y revisar
+"Seguridad de los datos": la app sigue sin enviar datos, pero ahora usa ubicación en primer plano
+con servicio en segundo plano durante la grabación; `tienda/privacidad.html` ya lo refleja.
 
 ## 3. iOS (en tu Mac)
 

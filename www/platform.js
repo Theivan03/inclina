@@ -68,6 +68,54 @@ var Platform = (function () {
     return Promise.resolve();
   }
 
+  /* --- GPS en segundo plano (plugin BackgroundGeolocation, app Android/iOS). Devuelve función para parar. ---
+     Con la app en segundo plano o la pantalla apagada sigue llegando posición gracias a un servicio
+     con notificación. En la web usa watchPosition normal. */
+  function hasBackgroundGps() { return has('BackgroundGeolocation'); }
+  function watchPositionBackground(onFix, onError, opts) {
+    if (!has('BackgroundGeolocation')) return watchPosition(onFix, onError);
+    if (has('Motion') && P.Motion.ensureNotificationPermission) { try { P.Motion.ensureNotificationPermission(); } catch (e) {} }
+    var id = null, stopped = false;
+    var o = { backgroundTitle: (opts && opts.title) || 'Inclina está grabando tu ruta', backgroundMessage: (opts && opts.message) || 'Toca Parar en la app cuando acabes.',
+      requestPermissions: true, stale: false, distanceFilter: 0 };
+    Promise.resolve(P.BackgroundGeolocation.addWatcher(o, function (loc, err) {
+      if (err) { onError({ code: err.code === 'NOT_AUTHORIZED' ? 1 : 2, message: err.message || String(err) }); return; }
+      if (!loc) return;
+      onFix({ coords: { latitude: loc.latitude, longitude: loc.longitude, accuracy: loc.accuracy, altitude: loc.altitude, altitudeAccuracy: loc.altitudeAccuracy, heading: loc.bearing, speed: loc.speed }, timestamp: loc.time || Date.now() });
+    })).then(function (wid) { id = wid; if (stopped) P.BackgroundGeolocation.removeWatcher({ id: wid }); }).catch(function (e) { onError({ code: 2, message: String(e) }); });
+    return function () { stopped = true; if (id != null) { try { P.BackgroundGeolocation.removeWatcher({ id: id }); } catch (e) {} } };
+  }
+  function openLocationSettings() { if (has('BackgroundGeolocation')) { try { P.BackgroundGeolocation.openSettings(); } catch (e) {} } }
+
+  /* --- voz (TTS nativo en la app; speechSynthesis en el navegador) --- */
+  function canSpeak() { return has('TextToSpeech') || !!window.speechSynthesis; }
+  function speak(text) {
+    if (has('TextToSpeech')) { return P.TextToSpeech.speak({ text: text, lang: 'es-ES', rate: 1.05, pitch: 1, volume: 1, category: 'ambient' }).catch(function () {}); }
+    if (window.speechSynthesis) {
+      try { var u = new SpeechSynthesisUtterance(text); u.lang = 'es-ES'; u.rate = 1.05; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } catch (e) {}
+    }
+    return Promise.resolve();
+  }
+
+  /* --- compartir / guardar una imagen PNG (data URL) --- */
+  function sharePng(name, dataUrl, title) {
+    if (has('Filesystem') && has('Share')) {
+      var b64 = dataUrl.split(',')[1];
+      return P.Filesystem.writeFile({ path: name, data: b64, directory: 'CACHE' })
+        .then(function (r) { return P.Share.share({ title: title, dialogTitle: title, files: [r.uri] }); });
+    }
+    return fetch(dataUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+      var file = new File([blob], name, { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) return navigator.share({ files: [file], title: title });
+      var url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 2000);
+    });
+  }
+  function openExternal(url) {
+    if (native) { try { window.open(url, '_system'); return; } catch (e) {} }
+    window.open(url, '_blank', 'noopener');
+  }
+
   /* --- sensores de movimiento nativos (plugin Motion, solo en la app Android) ---
      onBatch recibe { samples: [[ax,ay,az,gx,gy,gz,tMs], ...], hz }. Devuelve una función para parar, o null si no hay plugin. */
   function hasNativeMotion() { return has('Motion'); }
@@ -95,5 +143,7 @@ var Platform = (function () {
 
   return { native: native, os: os, watchPosition: watchPosition, keepAwake: keepAwake, isAwake: isAwake, onWakeChange: onWakeChange,
     canShare: canShare, shareCsv: shareCsv, downloadCsv: downloadCsv, onBack: onBack, ready: ready,
-    hasNativeMotion: hasNativeMotion, startNativeMotion: startNativeMotion };
+    hasNativeMotion: hasNativeMotion, startNativeMotion: startNativeMotion,
+    hasBackgroundGps: hasBackgroundGps, watchPositionBackground: watchPositionBackground, openLocationSettings: openLocationSettings,
+    canSpeak: canSpeak, speak: speak, sharePng: sharePng, openExternal: openExternal };
 })();

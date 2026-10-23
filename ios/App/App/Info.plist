@@ -26,6 +26,12 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Inclina usa tu ubicación solo para calcular la velocidad durante una salida y mejorar la precisión del ángulo de inclinación. No se guarda ningún recorrido ni sale del teléfono.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Inclina usa tu ubicación mientras grabas una ruta, también con la pantalla apagada, para registrar el recorrido y la velocidad. Nunca se envía a ningún servidor.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>NSMotionUsageDescription</key>
 	<string>Inclina lee el giróscopo y el acelerómetro del teléfono para medir el ángulo de inclinación de la moto.</string>
 	<key>UIRequiredDeviceCapabilities</key>

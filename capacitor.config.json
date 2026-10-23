@@ -6,7 +6,8 @@
   "loggingBehavior": "production",
   "android": {
     "allowMixedContent": false,
-    "zoomEnabled": false
+    "zoomEnabled": false,
+    "useLegacyBridge": true
   },
   "ios": {
     "contentInset": "never",
