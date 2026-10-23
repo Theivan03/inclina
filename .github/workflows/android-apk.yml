@@ -28,7 +28,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
+      - name: SDK de Android (viene preinstalado en el runner; solo añadimos la plataforma 36)
+        run: |
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses > /dev/null 2>&1 || true
+          "$SDKM" "platforms;android-36" "platform-tools" > /dev/null
 
       - name: Dependencias web
         run: npm ci
