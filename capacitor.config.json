@@ -1,0 +1,31 @@
+{
+  "appId": "com.ivancabrera.inclina",
+  "appName": "Inclina",
+  "webDir": "www",
+  "backgroundColor": "#0d1014",
+  "loggingBehavior": "production",
+  "android": {
+    "allowMixedContent": false,
+    "zoomEnabled": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "allowsLinkPreview": false
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover",
+      "style": "DARK"
+    },
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 0,
+      "backgroundColor": "#0d1014",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_CROP",
+      "splashFullScreen": false,
+      "splashImmersive": false
+    }
+  }
+}

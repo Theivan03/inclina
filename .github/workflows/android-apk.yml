@@ -1,0 +1,59 @@
+# Compila el APK de Inclina en GitHub (no hace falta Android Studio).
+# Se ejecuta en cada push a main y también a mano desde la pestaña Actions ("Run workflow").
+# El APK aparece en la ejecución como artefacto "inclina-debug-apk" y, además, en una Release
+# llamada "latest" para descargarlo directo al móvil.
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Dependencias web
+        run: npm ci
+
+      - name: Copiar www a Android
+        run: npx cap sync android
+
+      - name: Compilar APK (debug, instalable directamente)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../inclina-debug.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inclina-debug-apk
+          path: inclina-debug.apk
+
+      - name: Publicar en la release "latest"
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Inclina (última compilación)
+          body: "APK de pruebas. Para instalar: descarga en el móvil, ábrelo y permite instalar desde este origen."
+          files: inclina-debug.apk
+          prerelease: true

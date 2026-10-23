@@ -1,0 +1,61 @@
+INCLINA — inclinómetro de moto (web app)
+=========================================
+
+Qué es
+------
+Una web app que lee el giróscopo, el acelerómetro y el GPS del móvil y muestra el ángulo de
+inclinación en vivo, los máximos a izquierda y derecha, la lista de curvas de cada salida
+(ángulo máximo, velocidad, duración) y un histórico con exportación a CSV. Sin pagos, sin
+anuncios, sin cuenta. Todo se guarda en el propio móvil.
+
+Instalación (una vez)
+---------------------
+1. Sube la carpeta entera a tu hosting por HTTPS, por ejemplo en  https://tudominio.com/inclina/
+   Archivos: index.html, lean-core.js, platform.js, manifest.webmanifest, sw.js, los tres icon-*.png
+   y la carpeta fonts/. Tienen que estar juntos, con la misma estructura.
+   (Sirve cualquier hosting estático: Hostinger, GitHub Pages, Netlify...). HTTPS es obligatorio:
+   sin él, Chrome no da acceso al GPS ni a los sensores.
+2. En el móvil, abre esa dirección en Chrome.
+3. Concede permisos cuando los pida: ubicación (para la velocidad) y sensores de movimiento.
+   En Chrome Android los sensores no piden permiso; en iPhone/Safari sí, al pulsar Cero.
+4. Menú de Chrome (⋮) → "Añadir a pantalla de inicio" / "Instalar aplicación". Queda un icono
+   y se abre a pantalla completa, también sin cobertura.
+
+Uso
+---
+- Monta el móvil en el soporte (Quad Lock en la tija, pantalla hacia ti). Vale en vertical o
+  apaisado, da igual cuánto esté echado hacia atrás.
+- CERO: con la moto vertical, tú encima y quieta (o en recta a velocidad constante), pulsa
+  Cero y no la muevas 2 segundos. Esto le enseña a la app cómo está puesto el móvil. Solo hay
+  que repetirlo si cambias el móvil de posición.
+- INICIAR SALIDA: empieza a registrar. La pantalla se queda encendida. PARAR guarda la salida y
+  abre el resumen.
+- Si en marcha marca el lado contrario, activa "Invertir izquierda y derecha" en Ajustes.
+- Ajustes → "Salida simulada" genera una salida ficticia para ver cómo funciona todo sin
+  sensores (por ejemplo en el PC).
+
+Cómo calcula el ángulo
+----------------------
+El giróscopo mide la velocidad a la que la moto cae hacia un lado y se integra para obtener el
+ángulo. La deriva se corrige con la física de la curva (tan φ = v·ω/g: velocidad GPS por
+velocidad de giro) cuando hay velocidad, y con el acelerómetro solo cuando vas recto. Por eso
+en una curva mantenida NO cae a 0°, que es el fallo típico de los inclinómetros de móvil.
+Precisión esperable con un móvil bien sujeto: unos 3-5°.
+
+El signo y la unidad del giróscopo (°/s o rad/s) los aprende solos en los primeros segundos de
+movimiento; en Ajustes → Sensores se ve lo que ha aprendido y los ángulos en vivo.
+
+Seguridad
+---------
+El número en vivo no es para mirarlo en plena curva. Mira el máximo al salir de ella y el
+resumen al acabar.
+
+Archivos
+--------
+index.html            la app (pantalla de marcha, salidas, ajustes)
+lean-core.js          el cálculo del ángulo y el detector de curvas (sin dependencias)
+platform.js           capa que usa GPS/pantalla/compartir nativos cuando va empaquetada con Capacitor
+fonts/                tipografías Barlow (licencia OFL), para funcionar sin red
+sw.js                 service worker: funciona sin conexión y recibe actualizaciones
+manifest.webmanifest  datos para instalarla como app
+icon-*.png            iconos
