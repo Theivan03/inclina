@@ -116,6 +116,6 @@ Rellena cada apartado así:
 **Permisos sensibles**: la app pide ubicación precisa y, durante la grabación, mantiene un servicio en primer plano de tipo "location" con notificación (FOREGROUND_SERVICE_LOCATION). No declara ACCESS_BACKGROUND_LOCATION, así que el formulario de "ubicación en segundo plano" no aplica; si Play lo pregunta, explica que la grabación de rutas usa un servicio en primer plano iniciado por el usuario y visible en la barra de notificaciones.
 
 ## Notas de la versión (500)
-2.1.0: el inclinómetro se calibra solo. Rutas planificadas en el mapa, aparcamiento, tiempo, capa con tus rutas, niveles y logros, mantenimiento por km en el garaje y pantalla Acerca de.
+2.1.1: el inclinómetro se calibra solo (sin botón de calibrar) y muestra el máximo y la última curva de cada lado. Rutas planificadas en el mapa, aparcamiento, tiempo, capa con tus rutas, niveles y logros, mantenimiento por km en el garaje y pantalla Acerca de.
 
-EN: 2.1.0: self-calibrating lean sensor. Planned routes on the map, parking, weather, a layer with your rides, levels and achievements, km-based maintenance in the garage and an About screen.
+EN: 2.1.1: self-calibrating lean sensor (no calibrate button) showing each side's maximum and latest corner. Planned routes on the map, parking, weather, a layer with your rides, levels and achievements, km-based maintenance in the garage and an About screen.

@@ -176,7 +176,7 @@ completo; eso llegará en la fase 2).
 **Calibración automática (v2.1).** Ya no hace falta pulsar Cero: con el móvil quieto en el soporte
 toma la vertical en 1,5 s y, rodando recto a más de 18 km/h, la afina y la corrige sola (también si
 Cero se hizo mal). En Ajustes → Sensores, "Ángulo giro" indica la referencia en uso: manual,
-automática (reposo) o automática (rodando). Cero sigue disponible para forzarla a mano.
+automática (reposo) o automática (rodando). Ya no hay botón Cero: la calibración manual desapareció en 2.1.1.
 
 **Servicios externos (v2.1).** Además de las teselas de OpenFreeMap, la app consulta Open-Meteo
 (tiempo, posición redondeada a ~100 m, cada 10 min como mucho) y el servidor público de OSRM

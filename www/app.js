@@ -3,7 +3,7 @@
    rutas · detalle y reproducción · estadísticas · garaje · ajustes · simulación. */
 (function () {
   'use strict';
-  var APP_VERSION = '2.1.0';
+  var APP_VERSION = '2.1.1';
   var $ = function (s) { return document.querySelector(s); };
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var clamp = function (x, lo, hi) { return Math.max(lo, Math.min(hi, x)); };
@@ -66,15 +66,18 @@
       svg.appendChild(el('line', { 'class': 'tick' + (major ? ' major' : ''), x1: o[0].toFixed(1), y1: o[1].toFixed(1), x2: i[0].toFixed(1), y2: i[1].toFixed(1) }));
       if (major && !mini) { var lp = pt(a, R - 46); var t = el('text', { 'class': 'tlabel', x: lp[0].toFixed(1), y: (lp[1] + 6).toFixed(1), 'text-anchor': 'middle' }); t.textContent = Math.abs(a); svg.appendChild(t); }
     }
+    var lL = el('path', { 'class': 'mark last l', d: '' }), lR = el('path', { 'class': 'mark last r', d: '' }); svg.appendChild(lL); svg.appendChild(lR);
     var mL = el('path', { 'class': 'mark l', d: '' }), mR = el('path', { 'class': 'mark r', d: '' }); svg.appendChild(mL); svg.appendChild(mR);
     var needle = el('line', { 'class': 'needle', x1: CX, y1: CY - R - 20, x2: CX, y2: CY - R + 20 }); svg.appendChild(needle);
     var num = null; if (mini) { num = el('text', { 'class': 'num', x: CX, y: CY - 6 }); num.textContent = '0°'; svg.appendChild(num); }
     container.innerHTML = ''; container.appendChild(svg);
     function markPath(a) { if (!(Math.abs(a) > 0.5)) return ''; var tip = pt(a, R + 18), b1 = pt(a - 3.2, R + 40), b2 = pt(a + 3.2, R + 40); return 'M' + tip[0].toFixed(1) + ' ' + tip[1].toFixed(1) + ' L' + b1[0].toFixed(1) + ' ' + b1[1].toFixed(1) + ' L' + b2[0].toFixed(1) + ' ' + b2[1].toFixed(1) + ' Z'; }
     var last = {};
-    return function update(phi, maxL, maxR) {
-      var c = clamp(phi, -EDGE, EDGE), key = c.toFixed(1) + '|' + maxL.toFixed(0) + '|' + maxR.toFixed(0);
+    return function update(phi, maxL, maxR, lastL, lastR) {
+      lastL = lastL || 0; lastR = lastR || 0;
+      var c = clamp(phi, -EDGE, EDGE), key = c.toFixed(1) + '|' + maxL.toFixed(0) + '|' + maxR.toFixed(0) + '|' + lastL.toFixed(0) + '|' + lastR.toFixed(0);
       if (last.k === key) return; last.k = key;
+      lL.setAttribute('d', Math.abs(lastL - maxL) < 0.5 ? '' : markPath(-Math.min(lastL, EDGE))); lR.setAttribute('d', Math.abs(lastR - maxR) < 0.5 ? '' : markPath(Math.min(lastR, EDGE)));
       fill.setAttribute('d', Math.abs(c) < 0.5 ? '' : arc(R, 0, c)); fill.setAttribute('class', 'fill' + (c > 0 ? ' r' : ''));
       var n1 = pt(c, R - 20), n2 = pt(c, R + 20);
       needle.setAttribute('x1', n1[0].toFixed(1)); needle.setAttribute('y1', n1[1].toFixed(1)); needle.setAttribute('x2', n2[0].toFixed(1)); needle.setAttribute('y2', n2[1].toFixed(1));
@@ -92,15 +95,25 @@
   est.setOnFrame(function (f) { var first = !calib; calib = { up: f.up, bias: f.bias, at: Date.now(), kind: f.kind }; LS.set('inclina.calib', calib); if (first) { hideNotice(); toast(f.kind === 'auto-ride' ? 'Inclinómetro calibrado rodando recto.' : 'Inclinómetro calibrado en reposo. Se afinará solo al rodar recto.', 'ok'); } });
   var sens = { gyro: false, lastMotion: 0, lastGps: 0, speedKmh: null, speedMs: null, heading: null, gpsAcc: null, listening: false, nativeStop: null, gpsError: null, demo: false, rate: 0, src: MOTION_SRC, fix: null };
   var lastMotionT = null, rateCount = 0, rateT0 = 0, lastNativeTs = null;
-  var live = { phi: 0, source: 'gyro', leanMaxSinceFix: 0 };
+  var live = { phi: 0, source: 'gyro', leanMaxSinceFix: 0, lastL: 0, lastR: 0, curSide: 0, curPeak: 0 };
+  // "Última": pico de la curva en curso o de la última acabada, por lado. Empieza a 6°, acaba por debajo de 3°.
+  function trackLast(phi) {
+    var a = Math.abs(phi), side = phi < 0 ? -1 : 1;
+    if (live.curSide === 0) { if (a >= 6) { live.curSide = side; live.curPeak = a; } }
+    else if (side === live.curSide) { if (a > live.curPeak) live.curPeak = a; if (a < 3) live.curSide = 0; }
+    else if (a >= 6) { live.curSide = side; live.curPeak = a; }
+    else if (a < 3) live.curSide = 0;
+    if (live.curSide < 0) live.lastL = live.curPeak; else if (live.curSide > 0) live.lastR = live.curPeak;
+  }
+  function resetLast() { live.lastL = 0; live.lastR = 0; live.curSide = 0; live.curPeak = 0; }
 
   function handleSample(acc, rot, now, dtOverride) {
     var dt = dtOverride != null ? dtOverride : (lastMotionT == null ? 0 : (now - lastMotionT) / 1000);
     lastMotionT = now; sens.lastMotion = now; sens.gyro = !!rot;
     rateCount++; if (now - rateT0 > 1000) { sens.rate = rateCount * 1000 / (now - rateT0); rateCount = 0; rateT0 = now; }
-    if (calibrating) { calibCollect(acc, rot); return; }
     var s = est.update(acc, rot, dt, now);
     live.phi = s.phi; live.source = s.source;
+    if (s.ready) trackLast(s.phi);
     if (Math.abs(s.phi) > live.leanMaxSinceFix) live.leanMaxSinceFix = Math.abs(s.phi);
     if (rec) recFeed(s.phi, now);
   }
@@ -129,28 +142,6 @@
       else attach();
     });
   }
-
-  /* ---------- calibración ---------- */
-  var calibrating = false, calSum = null, calN = 0, calTimer = null;
-  function calibCollect(acc, rot) { if (!acc) return; if (!calSum) calSum = { a: [0, 0, 0], r: [0, 0, 0] }; for (var k = 0; k < 3; k++) { calSum.a[k] += acc[k]; if (rot) calSum.r[k] += rot[k]; } calN++; }
-  function startCalibration() {
-    startMotion().then(function (r) {
-      if (r !== 'ok') { toast(r === 'denied' ? 'Sin permiso para los sensores de movimiento.' : 'Este dispositivo no da acceso a los sensores de movimiento.', 'bad'); return; }
-      calibrating = true; calSum = null; calN = 0; $('#calOverlay').hidden = false;
-      var left = 2; $('#calCount').textContent = left;
-      calTimer = setInterval(function () { left--; if (left > 0) { $('#calCount').textContent = left; return; } clearInterval(calTimer); calTimer = null; finishCalibration(); }, 1000);
-    });
-  }
-  function finishCalibration() {
-    calibrating = false; $('#calOverlay').hidden = true;
-    if (!calSum || calN < 10) { toast('No llegan datos del sensor de movimiento. Comprueba el permiso y repite.', 'bad'); return; }
-    var up = calSum.a.map(function (x) { return x / calN; }), bias = calSum.r.map(function (x) { return x / calN; }), n = Math.hypot(up[0], up[1], up[2]);
-    if (n < 8 || n > 11.5) { toast('La moto se ha movido durante la calibración. Repítela parado.', 'bad'); return; }
-    calib = { up: up, bias: bias, at: Date.now(), kind: 'manual' }; LS.set('inclina.calib', calib);
-    est.setFrame(LeanCore.buildFrame(up), bias, 'manual');
-    toast('Calibrado a mano. Se seguirá afinando solo al rodar recto.', 'ok');
-  }
-  $('#calCancel').addEventListener('click', function () { if (calTimer) clearInterval(calTimer); calTimer = null; calibrating = false; $('#calOverlay').hidden = true; });
 
   /* ---------- GPS ---------- */
   var gpsStop = null, gpsMode = null, lastFix = null, autoStartSince = null;
@@ -441,7 +432,7 @@
       if (r !== 'ok' && !sens.demo) toast('Sin acceso a los sensores: se grabará la ruta sin inclinación.', 'warn');
       if (!sens.demo) startGps('bg');
       Platform.keepAwake(true);
-      rec = newRec(); if (sens.demo) rec.demo = true; if (wx.data && Date.now() - wx.at < 30 * 60000) rec.weather = wx.data; det.setOptions({ minPeak: settings.minPeak }); liveFeatures = []; drawLiveTrack(true); pausedSince = null; lastSave = performance.now();
+      resetLast(); rec = newRec(); if (sens.demo) rec.demo = true; if (wx.data && Date.now() - wx.at < 30 * 60000) rec.weather = wx.data; det.setOptions({ minPeak: settings.minPeak }); liveFeatures = []; drawLiveTrack(true); pausedSince = null; lastSave = performance.now();
       LS.set('inclina.recording', rec.id);
       recTick = setInterval(render, 1000);
       setFollow(true);
@@ -490,8 +481,9 @@
     var motionFresh = sens.lastMotion && (now - sens.lastMotion) < 2000;
     // HUD
     if (rec) {
-      gaugeMini(phi, mL, mR);
+      gaugeMini(phi, mL, mR, live.lastL, live.lastR);
       setText('#hudSpeed', speedTxt); setText('#hudMaxL', Math.round(mL) + '°'); setText('#hudMaxR', Math.round(mR) + '°');
+      setText('#hudLastL', live.lastL ? Math.round(live.lastL) + '°' : '—'); setText('#hudLastR', live.lastR ? Math.round(live.lastR) + '°' : '—');
       setHTML('#hudMeta', '<b>' + fmtKm(rec.dist) + '</b> · ' + rec.corners.length + (rec.corners.length === 1 ? ' curva' : ' curvas') + (rec.paused ? ' · <span class="pause">en pausa</span>' : ''));
       setText('#rideTimer', fmtTime(Date.now() - rec.start));
     }
@@ -499,13 +491,14 @@
     $('#hudCard').hidden = !rec; $('#idleCard').hidden = !!rec || planMode || parkOpen;
     // pantalla completa
     if (!$('#leanFull').hidden) {
-      gaugeFull(phi, mL, mR);
+      gaugeFull(phi, mL, mR, live.lastL, live.lastR);
       setText('#lfNum', ready ? ar + '°' : '—');
+      setText('#lfLastL', live.lastL ? Math.round(live.lastL) + '°' : '—'); setText('#lfLastR', live.lastR ? Math.round(live.lastR) + '°' : '—');
       if (!ready) { setText('#lfSide', sens.listening && motionFresh ? 'Calibrando: quieto un momento' : 'Calibrando'); setClass('#lfSide', 'side'); }
       else if (ar >= 3) { setText('#lfSide', phi < 0 ? 'Izquierda' : 'Derecha'); setClass('#lfSide', 'side ' + (phi < 0 ? 'l' : 'r')); } else { setText('#lfSide', 'Vertical'); setClass('#lfSide', 'side'); }
       setText('#lfMaxL', Math.round(mL) + '°'); setText('#lfMaxR', Math.round(mR) + '°');
       setHTML('#lfSpeed', speedTxt + '<span class="unit">km/h</span>');
-      setText('#lfMinor', rec ? rec.corners.length + ' curvas · ' + fmtKm(rec.dist) : (ready ? 'Sin grabar · pulsa Grabar ruta en el mapa' : 'Se calibra sola: móvil quieto o rodando recto'));
+      setText('#lfMinor', rec ? rec.corners.length + ' curvas · ' + fmtKm(rec.dist) : (ready ? 'Sin grabar · pulsa Grabar ruta en el mapa' : 'Se calibra sola: móvil quieto en el soporte o rodando recto'));
       setText('#lfTimer', rec ? fmtTime(Date.now() - rec.start) : '00:00:00'); setClass('#lfTimer', 'timer cifra' + (rec ? ' on' : ''));
       setClass('#lfSens', 'chip ' + (motionFresh ? (sens.gyro ? 'ok' : 'warn') : (sens.listening ? 'bad' : ''))); setText('#lfSens', motionFresh ? (sens.gyro ? 'Sensores' : 'Sin giróscopo') : 'Sensores');
       setClass('#lfGps', 'chip ' + (gpsFresh ? 'ok' : (sens.gpsError ? 'bad' : (gpsMode ? 'warn' : '')))); setText('#lfGps', gpsFresh ? 'GPS' : (sens.gpsError ? 'GPS ' + sens.gpsError : (gpsMode ? 'GPS…' : 'GPS')));
@@ -544,7 +537,6 @@
   function openLeanFull() { $('#leanFull').hidden = false; startMotion(); if (!gpsMode && !rec) startGps('fg'); }
   function closeLeanFull() { $('#leanFull').hidden = true; }
   $('#btnLeanFull').addEventListener('click', openLeanFull); $('#btnHudLean').addEventListener('click', openLeanFull); $('#btnLeanClose').addEventListener('click', closeLeanFull);
-  $('#btnZero').addEventListener('click', startCalibration);
 
   /* ---------- rutas: totales y lista ---------- */
   var ridesFilter = 'all', ridesQuery = '';
@@ -1069,7 +1061,6 @@
   $('#peakDown').addEventListener('click', function () { settings.minPeak = clamp(settings.minPeak - 1, 3, 60); applySettings(); });
   $('#peakUp').addEventListener('click', function () { settings.minPeak = clamp(settings.minPeak + 1, 3, 60); applySettings(); });
   $$('#themeSeg button').forEach(function (b) { b.addEventListener('click', function () { settings.theme = b.dataset.theme; applySettings(); }); });
-  $('#btnRecal').addEventListener('click', function () { showView('map'); openLeanFull(); startCalibration(); });
   $('#btnWipe').addEventListener('click', function () { armOrRun($('#btnWipe'), 'Borrar todos los datos', 'Toca otra vez para borrar', function () { DB.wipe().then(function () { try { localStorage.clear(); } catch (e) {} location.reload(); }); }); });
   function renderDiag() {
     var s = est.state, now = performance.now(), motionFresh = sens.lastMotion && (now - sens.lastMotion) < 2000, f1 = function (x) { return x == null ? '—' : (x > 0 ? '+' : '') + x.toFixed(1) + '°'; };
@@ -1118,7 +1109,6 @@
 
   /* ---------- arranque ---------- */
   Platform.onBack(function () {
-    if (!$('#calOverlay').hidden) { $('#calCancel').click(); return true; }
     if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return true; }
     if (!$('#leanFull').hidden) { closeLeanFull(); return true; }
     if (currentView === 'detail') { showView('rides'); return true; }
@@ -1130,7 +1120,7 @@
   });
   DB.open().then(function () { return DB.migrateFromLocalStorage(); }).then(function (n) { if (n) toast(n + ' salidas antiguas importadas al historial.', 'ok'); return recoverRide(); })
     .then(reloadVehicles).then(reloadRides).then(loadProfile).then(loadParking).then(loadPlans).then(checkAchievements).then(function () {
-      if (!calib) showNotice('El inclinómetro se calibra solo: con el móvil quieto en el soporte o rodando recto. Si quieres, Cero lo hace a mano.', 'warn');
+      if (!calib) showNotice('El inclinómetro se calibra solo: deja el móvil quieto en el soporte un par de segundos o rueda recto.', 'warn');
       initMap(); startGps('fg'); render(); Platform.ready(); maintStartupNotice();
     }).catch(function (e) { toast('Error al iniciar la base de datos: ' + (e && e.message ? e.message : e), 'bad'); initMap(); Platform.ready(); });
   if (!Platform.native && 'serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(function () {});

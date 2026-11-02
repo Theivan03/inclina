@@ -10,7 +10,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=2.1.0">
+<link rel="manifest" href="manifest.webmanifest?v=2.1.1">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
@@ -146,6 +146,7 @@ h2{font-family:var(--font-display);font-weight:700;font-size:var(--fs-row);line-
 .gauge-mini .fill.r{stroke:var(--color-right)}
 .gauge-mini .needle{stroke:var(--color-text);stroke-width:6;stroke-linecap:round}
 .gauge-mini .mark{fill:var(--color-left)}.gauge-mini .mark.r{fill:var(--color-right)}
+.gauge-mini .mark.last{fill:var(--color-scrim);stroke:var(--color-left);stroke-width:3.5;stroke-linejoin:round}.gauge-mini .mark.last.r{stroke:var(--color-right)}
 .gauge-mini .num{fill:var(--color-text);font-family:var(--font-display);font-weight:800;font-size:96px;text-anchor:middle}
 .gauge-mini .tick{stroke:var(--color-text-2);stroke-width:3}
 
@@ -161,6 +162,7 @@ h2{font-family:var(--font-display);font-weight:700;font-size:var(--fs-row);line-
 .gauge .tick.major{stroke:var(--color-text);stroke-width:3}
 .gauge .tlabel{fill:var(--color-text-2);font-family:var(--font-display);font-weight:600;font-size:17px}
 .gauge .mark{fill:var(--color-left)}.gauge .mark.r{fill:var(--color-right)}
+.gauge .mark.last{fill:var(--color-bg);stroke:var(--color-left);stroke-width:3;stroke-linejoin:round}.gauge .mark.last.r{stroke:var(--color-right)}
 .gauge .needle{stroke:var(--color-text);stroke-width:5;stroke-linecap:round}
 .readout{text-align:center;line-height:1;margin-top:calc(-1 * var(--sp-2))}
 .readout .num{font-family:var(--font-display);font-weight:800;font-size:clamp(120px,36vw,var(--fs-angle));line-height:.86;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
@@ -171,6 +173,12 @@ h2{font-family:var(--font-display);font-weight:700;font-size:var(--fs-row);line-
 .fig .label{display:block;margin-bottom:var(--sp-2)}
 .fig .val{display:block;font-family:var(--font-display);font-weight:700;font-size:var(--fs-figure-l);line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
 .fig .unit{font-size:.4em;font-weight:600;color:var(--color-text-2);margin-left:2px}
+.fig .last{display:block;margin-top:var(--sp-2);font-family:var(--font-display);font-weight:700;font-size:var(--fs-row);line-height:1;color:var(--color-text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig .last small{font-size:var(--fs-label);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
+.fig .last.l b{color:var(--color-left)}.fig .last.r b{color:var(--color-right)}
+.hud .maxes .last{font-family:var(--font-display);font-weight:700;font-size:18px;line-height:1;color:var(--color-text-2);margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hud .maxes .last small{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-right:4px}
+.hud .maxes .last.l b{color:var(--color-left)}.hud .maxes .last.r b{color:var(--color-right)}
 .minor{text-align:center;color:var(--color-text-2);font-weight:500;font-size:var(--fs-body)}
 
 /* ---------- avisos ---------- */
@@ -401,13 +409,16 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
 
 @media (orientation:landscape) and (max-height:520px){
   .hud .speed .val{font-size:56px}
-  .lean-full{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto auto;gap:var(--sp-2) var(--sp-5)}
+  .lean-full{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto auto;gap:var(--sp-2) var(--sp-5);padding-top:max(var(--sp-2),env(safe-area-inset-top,0px));padding-bottom:max(var(--sp-2),env(safe-area-inset-bottom,0px))}
   .lean-full .bar{grid-column:1/-1}
-  .lean-full .readout{align-self:center}
-  .lean-full .readout .num{font-size:clamp(96px,32vh,150px)}
+  .lean-full .gauge{max-width:calc(38vh * 2.13);align-self:center}
+  .lean-full .readout{align-self:center;margin-top:0}
+  .lean-full .readout .num{font-size:clamp(80px,28vh,150px)}
   .lean-full .figures{grid-column:1/-1}
-  .lean-full .minor{grid-column:1/-1}
-  .lean-full .lf-actions{grid-column:1/-1}
+  .lean-full .figures .val{font-size:36px}
+  .lean-full .minor{display:none}
+  .lean-full .lf-actions{grid-column:1/-1;margin-top:0!important}
+  .lean-full .lf-actions .btn.big{min-height:44px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -512,8 +523,8 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
         <div class="gauge-wrap"><div class="gauge-mini" id="gaugeMini"></div></div>
         <div class="speed"><span class="val" id="hudSpeed">—</span><div class="unit">km/h</div></div>
         <div class="maxes">
-          <div><span class="label">Izq</span><div class="val l" id="hudMaxL">0°</div></div>
-          <div><span class="label">Dcha</span><div class="val r" id="hudMaxR">0°</div></div>
+          <div><span class="label">Izq</span><div class="val l" id="hudMaxL">0°</div><div class="last l"><small>últ.</small><b id="hudLastL">—</b></div></div>
+          <div><span class="label">Dcha</span><div class="val r" id="hudMaxR">0°</div><div class="last r"><small>últ.</small><b id="hudLastR">—</b></div></div>
         </div>
         <div class="meta" id="hudMeta"><b>0,0 km</b> · 0 curvas</div>
       </div>
@@ -678,13 +689,12 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
     <div class="field"><label>Tema</label><span class="seg tall" id="themeSeg"><button type="button" data-theme="auto">Sistema</button><button type="button" data-theme="light">Día</button><button type="button" data-theme="dark">Noche</button></span></div>
   </div>
   <div class="actions">
-    <button class="btn wide" id="btnRecal" type="button">Calibrar a mano (Cero)</button>
     <button class="btn wide" id="btnDemo" type="button">Ruta simulada</button>
     <button class="btn danger wide" id="btnWipe" type="button">Borrar todos los datos</button>
   </div>
   <div class="help">
     <span class="label">Cómo funciona</span>
-    <p>El inclinómetro se calibra solo: toma la vertical con el móvil quieto y la afina rodando recto. No hace falta pulsar nada; Cero sigue disponible para hacerlo a mano.</p>
+    <p>El inclinómetro se calibra solo: toma la vertical con el móvil quieto en el soporte y la afina rodando recto. No hay que pulsar nada ni esperar a nada.</p>
     <p>Al grabar una ruta, el trazado se colorea por inclinación y cada curva se guarda con su ángulo máximo y su velocidad. El GPS sigue grabando con la pantalla apagada.</p>
     <p>Todo queda en este teléfono: sin cuenta, sin servidores, sin anuncios. Exporta en GPX o CSV cuando quieras.</p>
   </div>
@@ -701,7 +711,7 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
       <span>GPS</span><b id="dgGps">—</b>
       <span>Almacenamiento</span><b id="dgStore">—</b>
     </div>
-    <p style="margin-top:var(--sp-2);color:var(--color-text-2)" id="versionLine">Inclina v2.1.0</p>
+    <p style="margin-top:var(--sp-2);color:var(--color-text-2)" id="versionLine">Inclina v2.1.1</p>
   </div>
   <div class="help" id="about">
     <span class="label">Acerca de Inclina</span>
@@ -729,38 +739,27 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
     <span class="timer cifra" id="lfTimer" style="margin-left:auto;font-size:var(--fs-timer)">00:00:00</span>
   </header>
   <div class="gauge" id="gaugeFull"></div>
-  <div class="readout"><span class="num" id="lfNum">0°</span><div class="side" id="lfSide">Sin calibrar</div></div>
+  <div class="readout"><span class="num" id="lfNum">0°</span><div class="side" id="lfSide">Calibrando</div></div>
   <div class="figures">
-    <div class="fig"><span class="label">Máx izq</span><span class="val l" id="lfMaxL">0°</span></div>
+    <div class="fig"><span class="label">Máx izq</span><span class="val l" id="lfMaxL">0°</span><span class="last l"><small>última</small><b id="lfLastL">—</b></span></div>
     <div class="fig"><span class="label">Velocidad</span><span class="val" id="lfSpeed">—<span class="unit">km/h</span></span></div>
-    <div class="fig"><span class="label">Máx dcha</span><span class="val r" id="lfMaxR">0°</span></div>
+    <div class="fig"><span class="label">Máx dcha</span><span class="val r" id="lfMaxR">0°</span><span class="last r"><small>última</small><b id="lfLastR">—</b></span></div>
   </div>
   <div class="minor" id="lfMinor">0 curvas · 0,0 km</div>
-  <div class="actions lf-actions" style="margin-top:auto">
-    <button class="btn big" id="btnZero" type="button">Cero</button>
+  <div class="actions lf-actions" style="margin-top:auto;grid-template-columns:1fr">
     <button class="btn big" id="btnLeanClose" type="button">Mapa</button>
   </div>
-</div>
-
-<div class="overlay" id="calOverlay" hidden>
-  <span class="state">Calibrando</span>
-  <div class="mid">
-    <div class="count" id="calCount">2</div>
-    <span class="label">segundos</span>
-    <p>Mantén la moto vertical y no toques el móvil.</p>
-  </div>
-  <button class="btn big" id="calCancel" type="button">Cancelar</button>
 </div>
 
 <div class="toast notice" id="toast" hidden></div>
 <div class="lightbox" id="lightbox" hidden><img id="lightboxImg" alt=""></div>
 
 <script data-cfasync="false" src="vendor/maplibre-gl.js"></script>
-<script data-cfasync="false" src="lean-core.js?v=2.1.0"></script>
-<script data-cfasync="false" src="geo.js?v=2.1.0"></script>
-<script data-cfasync="false" src="db.js?v=2.1.0"></script>
-<script data-cfasync="false" src="achievements.js?v=2.1.0"></script>
-<script data-cfasync="false" src="platform.js?v=2.1.0"></script>
-<script data-cfasync="false" src="app.js?v=2.1.0"></script>
+<script data-cfasync="false" src="lean-core.js?v=2.1.1"></script>
+<script data-cfasync="false" src="geo.js?v=2.1.1"></script>
+<script data-cfasync="false" src="db.js?v=2.1.1"></script>
+<script data-cfasync="false" src="achievements.js?v=2.1.1"></script>
+<script data-cfasync="false" src="platform.js?v=2.1.1"></script>
+<script data-cfasync="false" src="app.js?v=2.1.1"></script>
 </body>
 </html>
