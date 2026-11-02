@@ -12,8 +12,9 @@ Orden recomendado: 1) compilar y probar en tu Android, 2) primera salida real, 3
 
 ```
 www/                   la app: index.html (pantallas y estilos), app.js (lógica), lean-core.js (cálculo del
-                       ángulo), geo.js (distancias, GPX, trazados), db.js (IndexedDB), platform.js (GPS en
-                       segundo plano, sensores nativos, voz, compartir), vendor/ (MapLibre), fuentes e iconos
+                       ángulo y calibración automática), geo.js (distancias, GPX, trazados), db.js (IndexedDB),
+                       achievements.js (niveles y logros), platform.js (GPS en segundo plano, sensores
+                       nativos, voz, compartir), vendor/ (MapLibre), fuentes e iconos
 capacitor.config.json  identificador com.ivancabrera.inclina, nombre Inclina, ajustes de barras y splash
 android/               proyecto Android Studio, ya con permisos, iconos, splash y firma preparada
 ios/                   proyecto Xcode, ya con permisos (Info.plist), iconos y splash, solo iPhone
@@ -32,7 +33,7 @@ Comandos (desde la carpeta del proyecto):
 | `npm run android` | abre el proyecto en Android Studio |
 | `npm run ios` | abre el proyecto en Xcode (solo en Mac) |
 | `npm run serve` | sirve `www/` en http://localhost:8080 para probar en el PC |
-| `npm test` | prueba el cálculo del ángulo con una ruta simulada |
+| `npm test` | prueba el cálculo del ángulo, la latencia y la calibración automática con rutas simuladas |
 | `npm run assets` | regenera iconos y splash si cambias `tools/make-assets.py` |
 
 Requisitos: Node 20 o superior. Android: Android Studio actual (instala el SDK 36 cuando lo pida).
@@ -172,10 +173,22 @@ Inclina → Batería → Sin restricciones).
 pasado quedan en caché del navegador/WebView para verlas sin cobertura (no es un mapa offline
 completo; eso llegará en la fase 2).
 
+**Calibración automática (v2.1).** Ya no hace falta pulsar Cero: con el móvil quieto en el soporte
+toma la vertical en 1,5 s y, rodando recto a más de 18 km/h, la afina y la corrige sola (también si
+Cero se hizo mal). En Ajustes → Sensores, "Ángulo giro" indica la referencia en uso: manual,
+automática (reposo) o automática (rodando). Cero sigue disponible para forzarla a mano.
+
+**Servicios externos (v2.1).** Además de las teselas de OpenFreeMap, la app consulta Open-Meteo
+(tiempo, posición redondeada a ~100 m, cada 10 min como mucho) y el servidor público de OSRM
+(rutas planificadas: solo los puntos tocados en el mapa). Sin claves ni cuentas; si no hay red, el
+tiempo no se muestra y las rutas planificadas se dibujan en línea recta. Si OSRM cambia sus
+condiciones de uso, cambia la URL en `routeBetween()` de `app.js` (cualquier servidor OSRM vale).
+
 **Ficha de Play Store.** Con la v2 hay que regenerar las capturas (`python3 tools/capturas.py` ya
 no vale tal cual: las pantallas han cambiado; hazlas a mano desde el móvil o pídemelas) y revisar
-"Seguridad de los datos": la app sigue sin enviar datos, pero ahora usa ubicación en primer plano
-con servicio en segundo plano durante la grabación; `tienda/privacidad.html` ya lo refleja.
+"Seguridad de los datos": sigue sin haber servidores propios, pero el teléfono envía coordenadas a
+OpenFreeMap, Open-Meteo y OSRM, así que conviene declarar "Ubicación: compartida, para funciones
+de la app" (detalle en `tienda/google-play.md`); `tienda/privacidad.html` ya lo refleja.
 
 ## 3. iOS (en tu Mac)
 

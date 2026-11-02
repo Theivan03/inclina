@@ -1,8 +1,8 @@
 /* Inclina — service worker: deja la app disponible sin cobertura.
    Archivos propios: red primero y copia en caché (así las actualizaciones llegan al momento).
    Las fuentes van incluidas en fonts/. */
-var CACHE = 'inclina-v2.0.0';
-var SHELL = ['./', './index.html', './app.js?v=2.0.0', './lean-core.js?v=2.0.0', './geo.js?v=2.0.0', './db.js?v=2.0.0', './platform.js?v=2.0.0', './manifest.webmanifest?v=2.0.0',
+var CACHE = 'inclina-v2.1.0';
+var SHELL = ['./', './index.html', './app.js?v=2.1.0', './lean-core.js?v=2.1.0', './geo.js?v=2.1.0', './db.js?v=2.1.0', './achievements.js?v=2.1.0', './platform.js?v=2.1.0', './manifest.webmanifest?v=2.1.0',
   './vendor/maplibre-gl.js', './vendor/maplibre-gl.css', './icon-192.png', './icon-512.png', './icon-512-maskable.png',
   './fonts/barlow-condensed-latin-600-normal.woff2', './fonts/barlow-condensed-latin-700-normal.woff2', './fonts/barlow-condensed-latin-800-normal.woff2', './fonts/barlow-latin-400-normal.woff2', './fonts/barlow-latin-500-normal.woff2', './fonts/barlow-latin-600-normal.woff2'];
 

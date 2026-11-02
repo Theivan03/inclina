@@ -1,6 +1,6 @@
 {
   "name": "inclina",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Inclina: inclinómetro de moto (PWA + Android + iOS con Capacitor)",
   "scripts": {
     "sync": "cap sync",
@@ -8,7 +8,7 @@
     "ios": "cap open ios",
     "assets": "python3 tools/make-assets.py && capacitor-assets generate --android --ios",
     "serve": "python3 -m http.server 8080 --directory www",
-    "test": "node tools/test-core.js"
+    "test": "node tools/test-core.js && node tools/test-latency.js && node tools/test-autocal.js"
   },
   "author": "Ivan Cabrera",
   "license": "UNLICENSED",

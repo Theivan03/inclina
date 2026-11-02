@@ -59,15 +59,73 @@ var LeanCore = (function () {
 
     var frame = null, bias = [0, 0, 0], phi = 0, speed = null, speedAt = -1e9, accF = null;
     var learn = { sxy: 0, sxx: 0, syy: 0, lastPhiAcc: null, r: 0 };
-    var onGain = null;
-    var st = { phi: 0, phiAcc: 0, phiPhys: null, rollRate: 0, yawRate: 0, rollRaw: 0, source: 'gyro', ready: false, gain: o.gyroGain, gainConf: 0, speed: null };
+    var onGain = null, onFrame = null;
+    var st = { phi: 0, phiAcc: 0, phiPhys: null, rollRate: 0, yawRate: 0, rollRaw: 0, source: 'gyro', ready: false, gain: o.gyroGain, gainConf: 0, speed: null, frameKind: null, autoRideS: 0, stillS: 0 };
 
-    function setFrame(fr, b) { frame = fr; bias = b || [0, 0, 0]; phi = 0; accF = null; learn.lastPhiAcc = null; st.ready = !!fr; }
+    /* Calibración automática.
+       - "auto-still": sin referencia, con el móvil quieto 1,5 s se toma la gravedad como vertical (vale para
+         probar en la mano y como arranque en la moto).
+       - "auto-ride": rodando recto (> 18 km/h, sin giro ni frenada) se promedia la gravedad en el móvil; esa
+         es la vertical real de la moto en marcha y refina (o sustituye) cualquier referencia anterior.
+       - El sesgo del giróscopo se estima siempre que el móvil está quieto. */
+    var auto = { ride: [0, 0, 0], rideT: 0, stillT: 0, stillSum: [0, 0, 0], stillRot: [0, 0, 0], stillN: 0, biasT: 0, lastAcc: null, appliedU: null };
+
+    function setFrame(fr, b, kind) { frame = fr; bias = b || [0, 0, 0]; phi = 0; accF = null; learn.lastPhiAcc = null; st.ready = !!fr; st.frameKind = fr ? (kind || 'manual') : null; auto.appliedU = fr ? fr.u.slice() : null; auto.ride = [0, 0, 0]; auto.rideT = 0; }
+    function refineFrame(fr, kind) { // cambia la referencia sin perder el ángulo integrado
+      frame = fr; st.ready = true; st.frameKind = kind; auto.appliedU = fr.u.slice();
+      if (accF) { var au = v3.dot(accF, frame.u), al = v3.dot(accF, frame.l); phi = Math.atan2(al, au) * R2D; }
+      if (onFrame) onFrame({ up: fr.u.slice(), bias: bias.slice(), kind: kind });
+    }
     function setSpeed(v, t) { speed = (v == null || isNaN(v)) ? null : v; speedAt = t; }
     function setInvert(inv) { o.invert = !!inv; }
     function setGain(g) { o.gyroGain = g; st.gain = g; }
     function setOnGain(f) { onGain = f; }
+    function setOnFrame(f) { onFrame = f; }
     function reset() { phi = 0; }
+
+    function autoCalibrate(acc, rot, dt, vFresh) {
+      if (!acc || !accF || !(dt > 0)) return;
+      var mag = v3.norm(accF), wMag = 0;
+      if (rot && !isNaN(rot[0])) {
+        var k = dt / (dt + 0.3), wm = Math.hypot(rot[0] - bias[0], rot[1] - bias[1], rot[2] - bias[2]) * Math.abs(o.gyroGain);
+        auto.wF = auto.wF == null ? wm : auto.wF + k * (wm - auto.wF); wMag = auto.wF;
+      }
+      var jitter = auto.lastAcc ? v3.norm(v3.sub(accF, auto.lastAcc)) : 0; auto.lastAcc = accF.slice();
+      var quiet = Math.abs(mag - G) < 0.6 && wMag < 2.0 && jitter < 0.25;
+      // sesgo del giróscopo: media lenta mientras está quieto
+      if (quiet && rot && !isNaN(rot[0])) {
+        auto.biasT += dt;
+        if (auto.biasT > 1) { var kb = Math.min(1, dt / 5); bias[0] += kb * (rot[0] - bias[0]); bias[1] += kb * (rot[1] - bias[1]); bias[2] += kb * (rot[2] - bias[2]); }
+      } else auto.biasT = 0;
+      // cero automático en reposo (solo cuando no hay ninguna referencia)
+      if (!frame) {
+        if (quiet) {
+          auto.stillT += dt; auto.stillSum[0] += accF[0] * dt; auto.stillSum[1] += accF[1] * dt; auto.stillSum[2] += accF[2] * dt;
+          if (rot && !isNaN(rot[0])) { auto.stillRot[0] += rot[0] * dt; auto.stillRot[1] += rot[1] * dt; auto.stillRot[2] += rot[2] * dt; }
+          st.stillS = auto.stillT;
+          if (auto.stillT >= 1.5) {
+            var up = v3.scale(auto.stillSum, 1 / auto.stillT);
+            if (rot && !isNaN(rot[0])) bias = v3.scale(auto.stillRot, 1 / auto.stillT);
+            auto.stillT = 0; auto.stillSum = [0, 0, 0]; auto.stillRot = [0, 0, 0];
+            refineFrame(buildFrame(up), 'auto-still');
+          }
+        } else { auto.stillT = 0; auto.stillSum = [0, 0, 0]; auto.stillRot = [0, 0, 0]; st.stillS = 0; }
+      }
+      // vertical real rodando recto
+      // recta de verdad: sin giro apreciable, sin frenada y, si ya hay referencia, con la moto casi vertical
+      var straight = vFresh && speed >= 5 && wMag < 2.5 && Math.abs(mag - G) < 1.0 && (!frame || Math.abs(phi) < 5);
+      if (straight) {
+        var decay = Math.exp(-dt / 120);
+        auto.ride[0] = auto.ride[0] * decay + accF[0] * dt; auto.ride[1] = auto.ride[1] * decay + accF[1] * dt; auto.ride[2] = auto.ride[2] * decay + accF[2] * dt;
+        auto.rideT = auto.rideT * decay + dt; st.autoRideS = auto.rideT;
+        if (auto.rideT >= 4) {
+          var u = v3.unit(auto.ride), cur = auto.appliedU ? v3.unit(auto.appliedU) : null;
+          var ang = cur ? Math.acos(Math.max(-1, Math.min(1, v3.dot(u, cur)))) * R2D : 999;
+          var threshold = (st.frameKind === 'auto-ride') ? 1.0 : 0.5;
+          if (!frame || ang > threshold) { auto.rideT = Math.min(auto.rideT, 8); refineFrame(buildFrame(u), 'auto-ride'); }
+        }
+      }
+    }
 
     function learnGain(pRaw, dPhiAcc, dt) {
       // Decaimiento lento para que lo aprendido se pueda revisar; sumas ponderadas por tiempo.
@@ -85,7 +143,6 @@ var LeanCore = (function () {
     }
 
     function update(acc, rot, dt, now) {
-      if (!frame) return st;
       if (!(dt > 0)) dt = 0; if (dt > 0.25) dt = 0.25;
       var a = accF ? dt / (dt + o.accTau) : 1;
       if (acc) {
@@ -95,6 +152,8 @@ var LeanCore = (function () {
       var vFresh = speed != null && (now - speedAt) < 4000;
       var still = vFresh && speed < o.vStill;
       st.speed = vFresh ? speed : null;
+      autoCalibrate(acc, rot, dt, vFresh);
+      if (!frame) return st;
 
       var phiAcc = 0, accMagOk = false;
       if (accF) {
@@ -137,7 +196,7 @@ var LeanCore = (function () {
       st.rollRate = s * p; st.yawRate = s * r; st.rollRaw = pRaw; st.source = src;
       return st;
     }
-    return { setFrame: setFrame, setSpeed: setSpeed, setInvert: setInvert, setGain: setGain, setOnGain: setOnGain, update: update, reset: reset, state: st };
+    return { setFrame: setFrame, setSpeed: setSpeed, setInvert: setInvert, setGain: setGain, setOnGain: setOnGain, setOnFrame: setOnFrame, update: update, reset: reset, state: st };
   }
 
   /* Detector de curvas: una curva empieza al pasar de "start" grados y acaba al bajar de "end"

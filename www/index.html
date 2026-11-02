@@ -10,7 +10,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=2.0.0">
+<link rel="manifest" href="manifest.webmanifest?v=2.1.0">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
@@ -102,6 +102,24 @@ h2{font-family:var(--font-display);font-weight:700;font-size:var(--fs-row);line-
 .map-ctrls button{width:46px;height:46px;border-radius:var(--r-l);border:0;background:var(--color-scrim);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;color:var(--color-text)}
 .map-ctrls button[aria-pressed="true"]{color:var(--color-accent)}
 .map-ctrls svg{width:24px;height:24px}
+.chip.wx{font-variant-numeric:tabular-nums}
+.card.slim{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-3);margin-bottom:var(--sp-2)}
+.card.slim .name{flex:1;font-family:var(--font-display);font-weight:700;font-size:var(--fs-row);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.slim .btn.small{min-height:40px;padding:0 var(--sp-2)}
+.plan-head{display:flex;align-items:center;justify-content:space-between}
+.plan-actions{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.plan-actions .btn{flex:1 1 auto}
+.btn.small.icon{min-height:36px;padding:0 var(--sp-2);border-width:0;background:none}
+.wp-marker{width:30px;height:30px;border-radius:50%;background:var(--color-accent);color:var(--color-on-fill);border:3px solid #fff;box-shadow:var(--shadow);font-family:var(--font-display);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:grab}
+.wp-marker.end{background:var(--color-text)}
+.park-marker{width:34px;height:34px;border-radius:var(--r-l);background:#1D5FCC;color:#fff;border:3px solid #fff;box-shadow:var(--shadow);font-family:var(--font-display);font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
+.wxline{display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-4);color:var(--color-text-2);font-weight:500;font-size:var(--fs-body-s);padding:var(--sp-2) 0}
+.wxline b{color:var(--color-text)}
+.plan{background:var(--color-surface);border:var(--line) solid var(--color-line);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3)}
+.plan .thumb{width:100%;height:120px;border-radius:var(--r-l);background:var(--color-bg);overflow:hidden}
+.plan .thumb svg{width:100%;height:100%}
+.plan .name{font-family:var(--font-display);font-weight:700;font-size:var(--fs-row)}
+.about a,.help a{color:var(--color-accent);text-decoration:underline;text-underline-offset:3px}
 .map-bottom{position:absolute;left:0;right:0;bottom:calc(var(--h-tabbar) + env(safe-area-inset-bottom,0px));z-index:3;
   padding:0 max(var(--gutter),env(safe-area-inset-right,0px)) var(--sp-3) max(var(--gutter),env(safe-area-inset-left,0px))}
 .card{background:var(--color-scrim);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:var(--sp-4)}
@@ -287,6 +305,32 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
 .stepper .v{min-width:3.2ch;text-align:center;font-size:var(--fs-timer);font-weight:700;font-family:var(--font-display);font-variant-numeric:tabular-nums}
 .stepper .v small{font-size:var(--fs-label);color:var(--color-text-2);font-weight:600;margin-left:2px}
 
+/* ---------- perfil y logros ---------- */
+.avatar{appearance:none;border:2px solid var(--color-line);background:var(--color-surface);width:46px;height:46px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--color-accent);box-shadow:var(--shadow);padding:0;flex:none}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar.big{width:84px;height:84px;font-size:40px;border-width:3px;border-color:var(--color-accent)}
+.profile-head{display:flex;gap:var(--sp-4);align-items:center}
+.name-input{width:100%;border:0;border-bottom:2px solid var(--color-line);background:none;font-family:var(--font-display);font-weight:800;font-size:34px;line-height:1;padding:var(--sp-1) 0;outline:none}
+.name-input:focus{border-color:var(--color-accent)}
+.level-pill{display:inline-block;margin-top:var(--sp-2);border:2px solid var(--color-accent);color:var(--color-accent);border-radius:var(--r-pill);padding:4px 12px;font-family:var(--font-display);font-weight:700;font-size:var(--fs-label);letter-spacing:.08em;text-transform:uppercase}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2)}
+.cat{background:var(--color-surface);border:var(--line) solid var(--color-line);border-radius:var(--r-l);padding:var(--sp-2);text-align:center}
+.cat .n{font-family:var(--font-display);font-weight:700;font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+.cat .label{font-size:11px;display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat .bar3{height:4px;border-radius:2px;background:var(--color-line);margin-top:6px;overflow:hidden}
+.cat .bar3 i{display:block;height:100%;background:var(--color-accent)}
+.ach{display:grid;grid-template-columns:44px 1fr auto;gap:var(--sp-1) var(--sp-3);align-items:center;padding:var(--sp-3) 0;border-bottom:var(--line) solid var(--color-line)}
+.ach .ico{grid-row:1/3;width:44px;height:44px;border-radius:var(--r-l);display:flex;align-items:center;justify-content:center;background:var(--color-surface);border:var(--line) solid var(--color-line);color:var(--color-text-2)}
+.ach.on .ico{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-on-fill)}
+.ach .ico svg{width:24px;height:24px}
+.ach .t{font-family:var(--font-display);font-weight:700;font-size:var(--fs-row);line-height:1}
+.ach .d{color:var(--color-text-2);font-size:var(--fs-body-s);font-weight:500}
+.ach .xp{grid-column:3;grid-row:1/3;font-family:var(--font-display);font-weight:700;color:var(--color-accent);white-space:nowrap}
+.ach.locked .t,.ach.locked .xp{color:var(--color-text-2)}
+.ach .prog{grid-column:2;height:4px;border-radius:2px;background:var(--color-line);overflow:hidden;margin-top:2px}
+.ach .prog i{display:block;height:100%;background:var(--color-accent)}
+
 /* ---------- estadísticas ---------- */
 .goals{display:flex;flex-direction:column;gap:var(--sp-2);background:var(--color-surface);border:var(--line) solid var(--color-line);border-radius:var(--r-l);padding:var(--sp-3)}
 .goal{display:grid;grid-template-columns:1fr auto;gap:var(--sp-1) var(--sp-2);align-items:center;font-weight:600}
@@ -313,6 +357,21 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
 .vstats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-2);text-align:center}
 .vstats .fig .val{font-size:30px}
 .form{display:flex;flex-direction:column;gap:var(--sp-3);background:var(--color-surface);border:var(--line) solid var(--color-line);border-radius:var(--r-xl);padding:var(--sp-4)}
+.maint{border-top:var(--line) solid var(--color-line);padding-top:var(--sp-3);display:flex;flex-direction:column;gap:var(--sp-2)}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2)}
+.mstatus{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:700;font-size:var(--fs-label);letter-spacing:.06em;text-transform:uppercase;border-radius:var(--r-pill);padding:4px 10px;background:var(--color-line);color:var(--color-text-2);white-space:nowrap}
+.mstatus.ok{background:color-mix(in srgb,var(--color-ok) 18%,transparent);color:var(--color-ok)}
+.mstatus.soon{background:color-mix(in srgb,var(--color-warn) 20%,transparent);color:var(--color-warn)}
+.mstatus.due{background:color-mix(in srgb,var(--color-error) 20%,transparent);color:var(--color-error)}
+.mitem{display:grid;grid-template-columns:1fr auto auto;gap:var(--sp-1) var(--sp-2);align-items:center;padding:var(--sp-2) 0;border-bottom:var(--line) solid var(--color-line)}
+.mitem:last-of-type{border-bottom:0}
+.mitem .mname{font-family:var(--font-display);font-weight:700;font-size:var(--fs-row)}
+.mitem .msub{color:var(--color-text-2);font-size:var(--fs-body-s);font-weight:500}
+.mitem .bar3{grid-column:1/-1;height:5px;border-radius:3px;background:var(--color-line);overflow:hidden}
+.mitem .bar3 i{display:block;height:100%;background:var(--color-ok)}
+.mitem.soon .bar3 i{background:var(--color-warn)}.mitem.due .bar3 i{background:var(--color-error)}
+.mitem .btn.small{min-height:36px}
+.mitem button.edit{appearance:none;border:0;background:none;text-align:left;padding:0;color:inherit;font:inherit}
 .form input[type=text],.form input[type=number]{width:100%;border:2px solid var(--color-line);border-radius:var(--r-l);background:var(--color-bg);padding:var(--sp-3);font-size:var(--fs-body)}
 .form .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2)}
 
@@ -379,6 +438,12 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
   <symbol id="i-next" viewBox="0 0 24 24"><path d="M18 5v14M6 5l9 7-9 7z" fill="currentColor"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 4 9 5-9 5-9-5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="m3 13 9 5 9-5M3 17l9 5 9-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-park" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M9.5 17V7h3.2a3 3 0 0 1 0 6H9.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="18" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M8 17h6a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 7 4 11l5 4M4 11h9a5 5 0 0 1 0 10h-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 3.5a5 5 0 0 0-5.3 6.8L3.5 16l4.5 4.5 5.7-5.7a5 5 0 0 0 6.8-5.3l-3 3-3-1-1-3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-weather" viewBox="0 0 24 24"><circle cx="9" cy="9" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M9 2v1.5M2 9h1.5M4 4l1 1M14 4l-1 1M7 20h11a3.5 3.5 0 0 0 .5-7A5 5 0 0 0 9 14.5 2.8 2.8 0 0 0 7 20z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
 <div class="app">
@@ -391,14 +456,46 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
       <span class="chip" id="chipSens">Sensores</span>
       <span class="chip" id="chipGps">GPS</span>
       <button class="chip" id="chipWake" type="button" title="Mantener la pantalla encendida">Pantalla</button>
+      <span class="chip wx" id="chipWx" hidden title="Tiempo actual (Open-Meteo)">—</span>
     </div>
     <span class="timer cifra" id="rideTimer" hidden>00:00:00</span>
+    <button class="avatar" id="btnProfile" type="button" title="Perfil"><span id="avatarMini">I</span></button>
   </div>
   <div class="map-ctrls">
     <button type="button" id="btnFollow" aria-pressed="true" title="Seguirme"><svg><use href="#i-locate"/></svg></button>
     <button type="button" id="btnHeading" aria-pressed="false" title="Orientar al rumbo"><svg><use href="#i-compass"/></svg></button>
+    <button type="button" id="btnLayers" aria-pressed="false" title="Ver mis rutas en el mapa"><svg><use href="#i-layers"/></svg></button>
+    <button type="button" id="btnPark" aria-pressed="false" title="Aparcamiento"><svg><use href="#i-park"/></svg></button>
+    <button type="button" id="btnPlan" aria-pressed="false" title="Planificar una ruta"><svg><use href="#i-route"/></svg></button>
   </div>
   <div class="map-bottom">
+    <div class="card slim" id="followCard" hidden>
+      <span class="label" style="color:var(--color-accent)">Siguiendo</span>
+      <span class="name" id="followName"></span>
+      <button class="btn small" id="followGmaps" type="button" title="Abrir en Google Maps"><svg><use href="#i-gmaps"/></svg></button>
+      <button class="btn small" id="followStop" type="button" title="Dejar de seguir"><svg><use href="#i-close"/></svg></button>
+    </div>
+    <div class="card" id="parkCard" hidden>
+      <div class="plan-head"><span class="label">Aparcamiento</span><button class="btn small icon" id="parkClose" type="button" title="Cerrar"><svg><use href="#i-close"/></svg></button></div>
+      <div class="muted" id="parkInfo" style="margin:var(--sp-2) 0 var(--sp-3)">Guarda dónde dejas la moto y vuelve a ella sin buscar.</div>
+      <div class="plan-actions">
+        <button class="btn small primary" id="parkHere" type="button">Guardar aquí</button>
+        <button class="btn small" id="parkGo" type="button" hidden><svg><use href="#i-gmaps"/></svg>Cómo llegar</button>
+        <button class="btn small" id="parkShow" type="button" hidden>Ver en el mapa</button>
+        <button class="btn small danger" id="parkForget" type="button" hidden>Olvidar</button>
+      </div>
+    </div>
+    <div class="card" id="planCard" hidden>
+      <div class="plan-head"><span class="label">Planificar ruta</span><button class="btn small icon" id="planClose" type="button" title="Cerrar"><svg><use href="#i-close"/></svg></button></div>
+      <div class="muted" id="planInfo" style="margin:var(--sp-2) 0 var(--sp-3)">Toca el mapa para añadir puntos. Arrástralos para ajustar.</div>
+      <input type="text" id="planName" placeholder="Nombre de la ruta (opcional)" maxlength="60" style="margin-bottom:var(--sp-3)">
+      <div class="plan-actions">
+        <button class="btn small" id="planUndo" type="button" disabled><svg><use href="#i-undo"/></svg>Deshacer</button>
+        <button class="btn small" id="planClear" type="button" disabled>Limpiar</button>
+        <button class="btn small" id="planGmaps" type="button" disabled><svg><use href="#i-gmaps"/></svg>Maps</button>
+        <button class="btn small primary" id="planSave" type="button" disabled>Guardar</button>
+      </div>
+    </div>
     <div class="card" id="idleCard">
       <div class="totals">
         <div class="fig"><span class="label">Km totales</span><span class="val cifra" id="totKm">0<span class="unit">km</span></span></div>
@@ -443,6 +540,9 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
     <button class="pill" data-f="all" aria-pressed="true" type="button">Todas</button>
     <button class="pill" data-f="fav" aria-pressed="false" type="button">Favoritas</button>
     <button class="pill" data-f="lean" aria-pressed="false" type="button">Con inclinación</button>
+    <button class="pill" data-f="moto" aria-pressed="false" type="button" id="pillMoto" hidden>Moto</button>
+    <button class="pill" data-f="coche" aria-pressed="false" type="button" id="pillCoche" hidden>Coche</button>
+    <button class="pill" data-f="plans" aria-pressed="false" type="button">Planificadas</button>
   </div>
   <div id="ridesList" class="list"></div>
   <div class="actions" id="ridesActions" hidden><button class="btn wide" id="btnExportAll" type="button"><svg><use href="#i-download"/></svg>Exportar todas las curvas (CSV)</button></div>
@@ -475,6 +575,7 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
   </div>
   <span class="label">Récords de ruta</span>
   <div class="summary" id="detailSummary"></div>
+  <div class="wxline" id="detailWx" hidden></div>
   <div class="tablewrap" id="cornersWrap">
     <table id="detailTable">
       <thead><tr><th>Nº</th><th>Hora</th><th>Lado</th><th class="n">Máx</th><th class="n">km/h</th><th class="n">Seg</th></tr></thead>
@@ -500,6 +601,28 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
     <button class="btn" id="btnRename" type="button">Renombrar</button>
     <button class="btn danger wide" id="btnDeleteRide" type="button">Borrar esta ruta</button>
   </div>
+</section>
+
+<!-- PERFIL -->
+<section class="view" id="view-profile" role="tabpanel" hidden>
+  <div class="head"><button class="link" id="btnProfileBack" type="button"><svg><use href="#i-back"/></svg>Mapa</button><span class="label" id="profileXp"></span></div>
+  <div class="profile-head">
+    <button class="avatar big" id="btnAvatar" type="button" title="Cambiar foto"><span id="avatarBig">I</span></button>
+    <input type="file" id="avatarFile" accept="image/*" hidden>
+    <div style="flex:1;min-width:0">
+      <input type="text" id="profileName" class="name-input" maxlength="24" placeholder="Tu nombre">
+      <div class="level-pill" id="levelPill">Nivel 1 · Novato</div>
+    </div>
+  </div>
+  <div class="goals">
+    <div class="goal"><span class="label" style="color:var(--color-text)">XP</span><span class="label" id="levelNext"></span><span class="bar3"><i id="levelBar" style="width:0%"></i></span></div>
+  </div>
+  <div class="summary-row" id="profileTotals"></div>
+  <div class="goals" id="profileStreak"></div>
+  <span class="label">Logros · <span id="achCount"></span></span>
+  <div class="cats" id="achCats"></div>
+  <div class="pills" id="achFilter"></div>
+  <div id="achList" class="list"></div>
 </section>
 
 <!-- ESTADÍSTICAS -->
@@ -531,6 +654,14 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
     </div>
     <div class="actions"><button class="btn" id="vCancel" type="button">Cancelar</button><button class="btn primary" id="vSave" type="button">Guardar</button></div>
   </div>
+  <div id="maintForm" class="form" hidden>
+    <span class="label" id="maintFormTitle">Nueva tarea de mantenimiento</span>
+    <input type="text" id="mName" placeholder="Qué (p. ej. Aceite motor)" maxlength="40">
+    <div class="two"><input type="number" id="mKm" placeholder="Cada cuántos km" min="0" step="100" inputmode="numeric"><input type="number" id="mMonths" placeholder="Cada cuántos meses (opcional)" min="0" step="1" inputmode="numeric"></div>
+    <div class="two"><input type="number" id="mLastKm" placeholder="Km de la última vez" min="0" step="1" inputmode="numeric"><input type="date" id="mLastDate"></div>
+    <div class="actions"><button class="btn" id="mCancel" type="button">Cancelar</button><button class="btn primary" id="mSave" type="button">Guardar</button></div>
+    <button class="btn danger wide" id="mDelete" type="button" hidden>Quitar esta tarea</button>
+  </div>
   <div id="vehicles" style="display:flex;flex-direction:column;gap:var(--sp-3)"></div>
 </section>
 
@@ -547,13 +678,13 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
     <div class="field"><label>Tema</label><span class="seg tall" id="themeSeg"><button type="button" data-theme="auto">Sistema</button><button type="button" data-theme="light">Día</button><button type="button" data-theme="dark">Noche</button></span></div>
   </div>
   <div class="actions">
-    <button class="btn wide" id="btnRecal" type="button">Repetir calibración</button>
+    <button class="btn wide" id="btnRecal" type="button">Calibrar a mano (Cero)</button>
     <button class="btn wide" id="btnDemo" type="button">Ruta simulada</button>
     <button class="btn danger wide" id="btnWipe" type="button">Borrar todos los datos</button>
   </div>
   <div class="help">
     <span class="label">Cómo funciona</span>
-    <p>Monta el móvil firme en la tija y pulsa Cero con la moto vertical antes de salir. Define cómo está puesto el móvil; repítelo si lo cambias de sitio.</p>
+    <p>El inclinómetro se calibra solo: toma la vertical con el móvil quieto y la afina rodando recto. No hace falta pulsar nada; Cero sigue disponible para hacerlo a mano.</p>
     <p>Al grabar una ruta, el trazado se colorea por inclinación y cada curva se guarda con su ángulo máximo y su velocidad. El GPS sigue grabando con la pantalla apagada.</p>
     <p>Todo queda en este teléfono: sin cuenta, sin servidores, sin anuncios. Exporta en GPX o CSV cuando quieras.</p>
   </div>
@@ -570,7 +701,13 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
       <span>GPS</span><b id="dgGps">—</b>
       <span>Almacenamiento</span><b id="dgStore">—</b>
     </div>
-    <p style="margin-top:var(--sp-2);color:var(--color-text-2)" id="versionLine">Inclina v2.0.0</p>
+    <p style="margin-top:var(--sp-2);color:var(--color-text-2)" id="versionLine">Inclina v2.1.0</p>
+  </div>
+  <div class="help" id="about">
+    <span class="label">Acerca de Inclina</span>
+    <p><b>Inclina</b> la hace Ivan Cabrera, motorista, para motoristas. Sin cuenta, sin servidores, sin anuncios: todo lo que grabas se queda en tu teléfono y lo borras cuando quieras.</p>
+    <p class="muted">Mapa: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> con datos de <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> (ODbL) y OpenMapTiles, renderizado con MapLibre GL. Tiempo: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0). Rutas planificadas: servidor de demostración de <a href="https://project-osrm.org" target="_blank" rel="noopener">OSRM</a>. Tipografía Barlow (OFL). Estas consultas salen de tu teléfono solo con las coordenadas necesarias y sin identificarte.</p>
+    <p class="muted">Código y novedades: <a href="https://github.com/Theivan03/inclina" target="_blank" rel="noopener">github.com/Theivan03/inclina</a>. La app no sustituye tu criterio: mira el máximo al salir de la curva, no el número en vivo.</p>
   </div>
 </section>
 
@@ -619,10 +756,11 @@ textarea.note{width:100%;min-height:72px;border:2px solid var(--color-line);bord
 <div class="lightbox" id="lightbox" hidden><img id="lightboxImg" alt=""></div>
 
 <script data-cfasync="false" src="vendor/maplibre-gl.js"></script>
-<script data-cfasync="false" src="lean-core.js?v=2.0.0"></script>
-<script data-cfasync="false" src="geo.js?v=2.0.0"></script>
-<script data-cfasync="false" src="db.js?v=2.0.0"></script>
-<script data-cfasync="false" src="platform.js?v=2.0.0"></script>
-<script data-cfasync="false" src="app.js?v=2.0.0"></script>
+<script data-cfasync="false" src="lean-core.js?v=2.1.0"></script>
+<script data-cfasync="false" src="geo.js?v=2.1.0"></script>
+<script data-cfasync="false" src="db.js?v=2.1.0"></script>
+<script data-cfasync="false" src="achievements.js?v=2.1.0"></script>
+<script data-cfasync="false" src="platform.js?v=2.1.0"></script>
+<script data-cfasync="false" src="app.js?v=2.1.0"></script>
 </body>
 </html>

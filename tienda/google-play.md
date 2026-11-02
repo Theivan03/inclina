@@ -23,18 +23,21 @@ CÓMO FUNCIONA
 Usa el giróscopo y el acelerómetro del teléfono, y la velocidad del GPS. En vez de limitarse al acelerómetro (que en una curva mantenida marca casi 0°, porque la "gravedad aparente" se alinea con la moto), Inclina integra el giróscopo y corrige la deriva con la física de la curva: velocidad por velocidad de giro. El resultado se mantiene estable en curvas largas y vuelve a cero en recta.
 
 QUÉ INCLUYE
-• Pantalla de marcha con el ángulo en grande, el arco de inclinación y las marcas de máximo de cada lado.
-• Velocidad GPS, cronómetro, distancia y contador de curvas.
-• Pantalla siempre encendida mientras ruedas.
-• Lista de curvas de cada salida: ángulo máximo, lado, velocidad y duración.
-• Histórico de salidas en el teléfono.
-• Exportar a CSV (una salida o todas) y compartir por cualquier app.
-• Tema día (alto contraste para el sol) y noche (ámbar sobre fondo oscuro).
-• Calibración en 2 segundos: vale en vertical o apaisado, con cualquier inclinación del soporte.
-• Salida simulada para ver cómo funciona sin subirte a la moto.
+• Mapa con tu ruta en vivo, coloreada por inclinación, y el ángulo en un indicador mientras grabas.
+• Velocidad GPS, cronómetro, distancia, curvas, altitud y desnivel. Pausa automática en semáforos.
+• Lista de curvas de cada ruta: ángulo máximo, lado, velocidad y duración, cada una situada en el mapa.
+• Reproducción de la ruta, fotos, notas, estrellas y favoritos.
+• Exportar GPX, CSV y una tarjeta para compartir; importar GPX de otras apps.
+• Rutas planificadas tocando el mapa, para seguirlas mientras ruedas o enviarlas a Google Maps.
+• Aparcamiento: guarda dónde dejas la moto y vuelve a ella.
+• Tiempo actual en el mapa y guardado con cada ruta.
+• Garaje: odómetro por vehículo y mantenimiento por km (aceite, filtros, frenos...) con aviso cuando toca.
+• Estadísticas, objetivos semanales, rachas, niveles y logros (ninguno premia la velocidad).
+• Voz al salir de cada curva, pantalla siempre encendida y tema día/noche.
+• El inclinómetro se calibra solo: con el móvil quieto en el soporte o rodando recto.
 
 LO QUE NO HACE
-Sin anuncios, sin cuenta, sin suscripción, sin servidores. Todos los datos se quedan en tu teléfono. La ubicación se usa solo mientras hay una salida en marcha, para la velocidad; no se guarda el recorrido.
+Sin anuncios, sin cuenta, sin suscripción, sin servidores propios. Todos los datos se quedan en tu teléfono. Las únicas conexiones son las de los mapas (OpenFreeMap), el tiempo (Open-Meteo) y el cálculo de rutas planificadas (OSRM), sin ningún identificador tuyo.
 
 PRECISIÓN
 La de un teléfono bien sujeto al soporte: unos 3-5°. Suficiente para aprender; no es un instrumento de laboratorio.
@@ -51,18 +54,21 @@ HOW IT WORKS
 It uses the phone's gyroscope and accelerometer plus GPS speed. Instead of relying on the accelerometer alone (which reads close to 0° in a sustained corner, because apparent gravity aligns with the bike), Inclina integrates the gyroscope and corrects drift with cornering physics: speed times yaw rate. The result stays stable in long corners and returns to zero on the straights.
 
 WHAT'S INCLUDED
-• Ride screen with a large angle readout, lean arc and max markers for each side.
-• GPS speed, timer, distance and corner counter.
-• Screen stays on while riding.
-• Per-ride corner list: peak angle, side, speed and duration.
-• Ride history stored on the phone.
-• CSV export (one ride or all) and sharing through any app.
-• Day theme (high contrast for sunlight) and night theme (amber on dark).
-• 2-second calibration: works in portrait or landscape, at any mount tilt.
-• Simulated ride to see how it works without getting on the bike.
+• Map with your live route coloured by lean angle, and the angle on a gauge while recording.
+• GPS speed, timer, distance, corners, altitude and climb. Auto-pause at traffic lights.
+• Per-ride corner list: peak angle, side, speed and duration, each placed on the map.
+• Ride replay, photos, notes, stars and favourites.
+• GPX and CSV export plus a shareable card; GPX import from other apps.
+• Planned routes by tapping the map, to follow while riding or send to Google Maps.
+• Parking: save where you left the bike and find it again.
+• Current weather on the map, stored with every ride.
+• Garage: per-vehicle odometer and km-based maintenance (oil, filters, brakes…) with reminders.
+• Statistics, weekly goals, streaks, levels and achievements (none rewards speed).
+• Voice callout after every corner, screen always on, day/night theme.
+• Self-calibrating lean sensor: phone still in its mount, or riding straight.
 
 WHAT IT DOESN'T DO
-No ads, no account, no subscription, no servers. All data stays on your phone. Location is used only while a ride is running, for speed; the route is not stored.
+No ads, no account, no subscription, no servers of our own. All data stays on your phone. The only connections are for map tiles (OpenFreeMap), weather (Open-Meteo) and planned-route calculation (OSRM), with no identifier of yours.
 
 ACCURACY
 That of a phone firmly mounted: about 3-5°. Enough to learn from; not a lab instrument.
@@ -98,17 +104,18 @@ Rellena cada apartado así:
 
 **Aplicaciones de rastreo de contactos y estado de COVID-19**: No.
 
-**Seguridad de los datos** (Data safety): esta es la parte que más dudas genera. Google define "recoger" como enviar datos fuera del dispositivo. Inclina no envía nada, así que:
-- ¿Tu app recoge o comparte alguno de los tipos de datos de usuario obligatorios? → **No**.
-- Resultado: la ficha mostrará "No se recogen datos" y "No se comparten datos con terceros".
-- Aun así, en la sección de prácticas de seguridad marca: los datos se pueden borrar desde la app (Ajustes → Borrar todos los datos).
-- Si el formulario pregunta por la ubicación por ver el permiso en el manifiesto: se procesa de forma efímera, solo en el dispositivo, no se transmite. Eso no cuenta como recogida.
+**Seguridad de los datos** (Data safety): esta es la parte que más dudas genera. Google distingue "recoger" (enviar datos al desarrollador) de "compartir" (enviar datos a un tercero desde el dispositivo). Inclina no envía nada a ningún servidor tuyo, pero el teléfono sí consulta servicios de terceros con coordenadas: las teselas del mapa (OpenFreeMap), el tiempo (Open-Meteo, posición redondeada a ~100 m) y el enrutado de rutas planificadas (OSRM, solo los puntos tocados). Lo más seguro es declararlo:
+- ¿Tu app recoge o comparte alguno de los tipos de datos obligatorios? → **Sí**.
+- Tipo de datos: Ubicación → Ubicación aproximada y Ubicación precisa. Marca **Compartida** (no "Recogida"), finalidad "Funciones de la app", obligatoria (sin ubicación no hay mapa). No se usa para publicidad ni análisis.
+- Ningún otro tipo de datos (sin cuenta, sin identificadores, sin fotos fuera del dispositivo).
+- Prácticas de seguridad: los datos se transmiten cifrados (HTTPS) y el usuario puede borrar todos sus datos desde la app (Ajustes → Borrar todos los datos).
+- Si prefieres no marcar "compartida", la alternativa es documentar en la política que las peticiones son anónimas y efímeras; pero Google ha rechazado fichas por omitir transferencias de ubicación a APIs de terceros, así que declararlo evita sustos.
 
 **Servicios financieros, Salud, Gobierno**: No.
 
 **Permisos sensibles**: la app pide ubicación precisa y, durante la grabación, mantiene un servicio en primer plano de tipo "location" con notificación (FOREGROUND_SERVICE_LOCATION). No declara ACCESS_BACKGROUND_LOCATION, así que el formulario de "ubicación en segundo plano" no aplica; si Play lo pregunta, explica que la grabación de rutas usa un servicio en primer plano iniciado por el usuario y visible en la barra de notificaciones.
 
 ## Notas de la versión (500)
-Primera versión: ángulo de inclinación en vivo, máximos por curva y por salida, histórico y exportación CSV.
+2.1.0: el inclinómetro se calibra solo. Rutas planificadas en el mapa, aparcamiento, tiempo, capa con tus rutas, niveles y logros, mantenimiento por km en el garaje y pantalla Acerca de.
 
-EN: First release: live lean angle, per-corner and per-ride maximums, history and CSV export.
+EN: 2.1.0: self-calibrating lean sensor. Planned routes on the map, parking, weather, a layer with your rides, levels and achievements, km-based maintenance in the garage and an About screen.
